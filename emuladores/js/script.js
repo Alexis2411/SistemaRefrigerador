@@ -18,7 +18,7 @@ const tasaRequest = 2500;
 
 //Variables para manipulacion del emulador
 var data;
-var edoRefri = 0;
+var edoRefri = true;
 var bandIniciar = true;
 
 //Eventos WS de MQTT
@@ -27,18 +27,12 @@ const client = mqtt.connect(brokerURL, options);
 client.on("connect", () => {
     console.log("CLIENTE CONECTADO A BROKER 👌");
 
-    client.subscribe("iot-device", function(err) {
-        if (!err) {
-            console.log("SUBSCRIBE - SUCCESS");
-        } else {
-            console.log("SUBSCRIBE - ERROR");
-        }
-    });
 });
 
-client.on("message", function(toipc, message) {
+client.on("message", function(topic, message) {
     console.log(message.toString());
-    //console.log("Te topic is " + topic + " and the message is " + message.toString());
+    console.log("Te topic is " + topic + " and the message is " + message.edo.toString());
+    edoRefri = (message.toString());
 });
 
 client.on("reconnect", (error) => {
@@ -56,6 +50,13 @@ iniciar.addEventListener("click", () => {
         data = setInterval(generarDatos, tasaRequest);
         bandIniciar = false;
     }
+    client.subscribe("iot/" + dispositivo.value + "/edo", function(err) {
+        if (!err) {
+            console.log("SUBSCRIBE - SUCCESS");
+        } else {
+            console.log("SUBSCRIBE - ERROR");
+        }
+    });
 });
 
 //funcion para generar datos de prueba aleatorios para lectura de variables del emulador
@@ -63,38 +64,37 @@ function generarDatos() {
     let d = new Date();
     let t = d.toLocaleTimeString();
     let temperatura = parseFloat((Math.random() * (36 - 22) + 22).toFixed(2));
-    let humedad = parseFloat((Math.random() * (90 - 65) + 65).toFixed(2));
-
+    let velocidad = parseFloat((Math.random() * (90 - 65) + 65).toFixed(2));
+    let estado = edoRefri;
     //uso axios para enviar datos al api de ubidots
-    //const payload = {
-    //name: dispositivo.value,
-    //temp: temperatura,
-    //  hum: humedad
-    //};
-    client.publish("t/temp", JSON.stringify(temperatura), {
+    const payload = {
+        name: dispositivo.value,
+        temp: temperatura,
+        vel: velocidad,
+        edo: estado
+    };
+    client.publish("iot/" + dispositivo.value, JSON.stringify(payload), {
         quos: 0,
         retain: false,
     });
-    client.publish("t/hum", JSON.stringify(humedad), {
-        quos: 0,
-        retain: false,
-    });
-
 
     console.log(t, dispositivo.value, ' - ', 'temp: ', temperatura,
-        '; humedad: ', humedad);
+        '; velocidad: ', velocidad, '; estado gas: ', estado);
 }
 
 //Evento para encender/apagar refrigeracion
 refri.addEventListener("click", () => {
+    switchGas(edoRefri);
     console.log("REFRIGERACION : ", edoRefri);
 });
 
 
 // Funcion que simula el cambio de estado de las luces
-function switchLuz(tipo) {
-    if (tipo === "int") {
-        return edoRefri === 0 ? (edoRefri = 1) : (edoRefri = 0);
+function switchGas(tipo) {
+    if (tipo === true) {
+        return edoRefri = false;
+    } else {
+        return edoRefri = true;
     }
 }
 
@@ -102,5 +102,12 @@ function switchLuz(tipo) {
 detener.addEventListener("click", () => {
     clearInterval(data);
     bandIniciar = true;
+    client.unsubscribe("iot/" + dispositivo.value + "/edo", function(err) {
+        if (!err) {
+            console.log("SUBSCRIBE - SUCCESS");
+        } else {
+            console.log("SUBSCRIBE - ERROR");
+        }
+    });
     console.log(":::: EMULACION DETENIDA ::::");
 });
