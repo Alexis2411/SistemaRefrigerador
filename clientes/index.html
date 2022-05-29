@@ -8,18 +8,43 @@
 </head>
 
 <body>
+
     <h1>Cliente IOT</h1>
     <h3>IOT a Conectar</h3>
     <input type="text" id="dispositivo">
     <button id="iniciar">Conectar</button>
     <button id="detener">Detener</button>
 
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.2/css/bootstrap.min.css" rel="stylesheet" />
+
+
     <br><br>
     <h3>Acciones del contenedor</h3>
     <button id="refri">On/Off - Refrigeracion</button>
+    <button id="puerta">On/Off - Puertas</button>
 
     <script src="https://unpkg.com/mqtt@4.1.0/dist/mqtt.min.js"></script>
     <script src="./js/script.js"></script>
+    <br><br>
+    <div class="container">
+        <div class="row">
+            <table border="1" class="table" id="tablaprueba">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>name</th>
+                        <th>temCen</th>
+                        <th>temSuIzq</th>
+                        <th>temSuDer</th>
+                        <th>datoVelo</th>
+                        <th>edoGas</th>
+                        <th>edoPuerta</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+
 </body>
 
 </html>

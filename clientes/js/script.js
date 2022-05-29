@@ -3,7 +3,7 @@ const dispositivo = document.getElementById("dispositivo");
 const iniciar = document.getElementById("iniciar");
 const detener = document.getElementById("detener");
 const refri = document.getElementById("refri");
-
+const table = document.getElementById("tablaprueba");
 //Opciones para conexion del publicador
 const options = {
     connectTimeout: 4000,
@@ -13,12 +13,13 @@ const options = {
 };
 
 //Constante para url API ubidots CAMBIE LOS DATOS POR SU TOKEN PERSONAL
-const brokerURL = "ws://localhost:8083/mqtt";
+const brokerURL = "ws://20.119.68.166:8083/mqtt";
 const tasaRequest = 2500;
 
 //Variables para manipulacion del emulador
 var data;
-var edoRefri = true;
+var eP = true;
+var eG = true;
 var bandIniciar = true;
 
 //Eventos WS de MQTT
@@ -30,6 +31,8 @@ client.on("connect", () => {
 
 client.on("message", function(topic, message) {
     console.log(message.toString());
+    const x = JSON.parse(message.toString());
+    agregarFila(x.name, x.temCen, x.temSuIzq, x.temSuDer, x.velocidad, x.estadoR, x.estadoP);
     //console.log("Te topic is " + topic + " and the message is " + message.toString());
 });
 
@@ -47,14 +50,13 @@ iniciar.addEventListener("click", () => {
         console.log(":::: INICA EMULACION :::");
         bandIniciar = false;
     };
-    client.subscribe("iot/" + dispositivo.value + "/#", function(err) {
+    client.subscribe("iot/+/#", function(err) {
         if (!err) {
             console.log("SUBSCRIBE - SUCCESS" + dispositivo.value);
         } else {
             console.log("SUBSCRIBE - ERROR");
         }
     });
-
 });
 
 
@@ -64,25 +66,48 @@ refri.addEventListener("click", () => {
 });
 
 
-// Funcion que simula el cambio de estado de las luces
-function switchGas() {
-    if (edoRefri === true) {
-        edoRefri = false;
+function switchGas(tipo) {
+    if (tipo === true) {
+        eG = false;
     } else {
-        edoRefri = true;
+        eG = true;
     }
     const payload = {
-        edo: edoRefri
+        name: dispositivo.value,
+        estadoR: eG,
     };
-    client.publish("iot/" + dispositivo.value + "/edo", JSON.stringify(payload), {
+    client.publish("iot/" + dispositivo.value + '/estadoR', JSON.stringify(payload), {
         quos: 0,
         retain: false,
     });
-    console.log("REFRIGERACION : ", edoRefri);
+    console.log(dispositivo.value, ' - estadoR', eG);
+    return eG;
+}
+
+function switchPuerta(tipo) {
+    if (tipo === true) {
+        eP = false;
+    } else {
+        eP = true;
+    }
+    const payload = {
+        name: dispositivo.value,
+        estadoR: eP,
+    };
+    client.publish("iot/" + dispositivo.value + '/estadoP', JSON.stringify(payload), {
+        quos: 0,
+        retain: false,
+    });
+    console.log(dispositivo.value, ' - estadoP', eP);
+    return eP;
 }
 
 //Manejador de eventos  para detener el emulador
 detener.addEventListener("click", () => {
-    client.unsubscribe("iot/" + dispositivo.value + "/#");
-    console.log("Desconectado de: ", dispositivo.value);
+    client.unsubscribe("iot/+/#");
+    console.log("Desconectado");
 });
+
+function agregarFila(name, temCen, temSuIzq, temSuDer, velocidad, estadoR, estadoP) {
+    document.getElementById("tablaprueba").insertRow(1).innerHTML = '<td>' + name + '</td><td>' + temCen + '</td><td>' + temSuIzq + '</td><td>' + temSuDer + '</td><td>' + velocidad + '</td><td>' + estadoR + '</td><td>' + estadoP + '</td>';
+}
