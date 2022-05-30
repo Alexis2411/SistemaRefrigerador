@@ -53,7 +53,7 @@ iniciar.addEventListener("click", () => {
     };
     client.subscribe("iot/+/#", function(err) {
         if (!err) {
-            console.log("SUBSCRIBE - SUCCESS" + dispositivo.value);
+            console.log("SUBSCRIBE - SUCCESS");
         } else {
             console.log("SUBSCRIBE - ERROR");
         }
