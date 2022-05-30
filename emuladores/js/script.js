@@ -149,6 +149,9 @@ function detene() {
 }
 
 function inicia() {
+    if (dispositivo.value == "") {
+        dispositivo.value = "Nombre" + Math.floor(Math.random() * 1000);
+    }
     if (bandIniciar) {
         console.log(":::: INICA EMULACION :::");
         data = setInterval(generarDatos, tasaRequest);
