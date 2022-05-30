@@ -11,7 +11,6 @@
 
     <h1>Cliente IOT</h1>
     <h3>IOT a Conectar</h3>
-    <input type="text" id="dispositivo">
     <button id="iniciar">Conectar</button>
     <button id="detener">Detener</button>
 
@@ -20,7 +19,14 @@
 
     <br><br>
     <h3>Acciones del contenedor</h3>
+    <h3>Seleccionar dispositivo</h3>
+    <input type="text" id="dispositivo">
+    <br><br>
+    <br><br>
+    <label id="lblGas">On</label>
     <button id="refri">On/Off - Refrigeracion</button>
+    <br><br>
+    <label id="lblPuerta">On</label>
     <button id="puerta">On/Off - Puertas</button>
 
     <script src="https://unpkg.com/mqtt@4.1.0/dist/mqtt.min.js"></script>

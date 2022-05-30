@@ -4,8 +4,11 @@ const iniciar = document.getElementById("iniciar");
 const detener = document.getElementById("detener");
 const refri = document.getElementById("refri");
 const puerta = document.getElementById("puerta");
-const estado = document.getElementById("estado")
-    //Opciones para conexion del publicador
+const estado = document.getElementById("estado");
+const lblGas = document.getElementById("lblGas");
+const lblPuerta = document.getElementById("lblPuerta");
+
+//Opciones para conexion del publicador
 const options = {
     connectTimeout: 4000,
     clientId: dispositivo.value,
@@ -22,27 +25,23 @@ var data;
 var eP = true;
 var eG = true;
 var bandIniciar = true;
+var x = true;
 
 //Eventos WS de MQTT
 const client = mqtt.connect(brokerURL, options);
 
 client.on("connect", () => {
     console.log("CLIENTE CONECTADO A BROKER 👌");
-
 });
 
 client.on("message", function(topic, message) {
-    if (topic == "iot/" + dispositivo.value + "/estadoP") {
-        console.log(message.toString());
-        const x = JSON.parse(message.toString());
-        edoRefri = (x.estadoP);
-        console.log(x.estadoP);
+    console.log(message.toString());
+    const x = JSON.parse(message.toString());
+    if (x.action == "switchR") {
+        switchGas(eG);
     }
-    if (topic == "iot/" + dispositivo.value + "/estadoR") {
-        console.log(message.toString());
-        const x = JSON.parse(message.toString());
-        edoRefri = (x.estadoR);
-        console.log(x.estadoR);
+    if (x.action == "switchP") {
+        switchPuerta(eP);
     }
 });
 
@@ -56,14 +55,12 @@ client.on("error", (error) => {
 
 //Manejador de Evento click del boton que inica el emulador
 iniciar.addEventListener("click", () => {
-    if (bandIniciar) {
-        console.log(":::: INICA EMULACION :::");
-        data = setInterval(generarDatos, tasaRequest);
-        bandIniciar = false;
+    actualizarlbl();
+    if (x) {
+        inicia();
+    } else {
+        detene();
     }
-    client.subscribe("iot/" + dispositivo.value + "/estaodR");
-    client.subscribe("iot/" + dispositivo.value + "/estadoP");
-    estado.textContent = "Conectado 🟢";
 });
 
 //funcion para generar datos de prueba aleatorios para lectura de variables del emulador
@@ -76,20 +73,20 @@ function generarDatos() {
     let dv = parseFloat((Math.random() * (90 - 65) + 65).toFixed(2));
     //uso axios para enviar datos al api de ubidots
     const payload = {
-        name: dispositivo.value,
-        temCen: tem1,
+        nombreC: dispositivo.value,
+        temCent: tem1,
         temSuIzq: tem2,
         temSuDer: tem3,
-        velocidad: dv,
+        estadoP: eP,
         estadoR: eG,
-        estadoP: eP
+        velocidad: dv
     };
     client.publish("iot/" + dispositivo.value, JSON.stringify(payload), {
         quos: 0,
         retain: false,
     });
-
-    console.log(t, dispositivo.value, ' - ', 'temCen: ' + tem1, 'temSuIzq: ' + tem2, 'temSuDer: ' + tem3,
+    actualizarlbl();
+    console.log(t, dispositivo.value, ' - ', 'temCent: ' + tem1, 'temSuIzq: ' + tem2, 'temSuDer: ' + tem3,
         'velocidad: ' + dv, 'estadoR: ' + eG, 'estadoP: ' + eP);
 }
 
@@ -111,14 +108,15 @@ function switchGas(tipo) {
         eG = true;
     }
     const payload = {
-        name: dispositivo.value,
+        nombreC: dispositivo.value,
         estadoR: eG,
     };
-    client.publish("iot/" + dispositivo.value + '/estadoR', JSON.stringify(payload), {
+    client.publish("sa/" + dispositivo.value + '/estadoR', JSON.stringify(payload), {
         quos: 0,
         retain: false,
     });
     console.log(dispositivo.value, ' - estadoR', eG);
+    actualizarlbl();
     return eG;
 }
 
@@ -129,19 +127,46 @@ function switchPuerta(tipo) {
         eP = true;
     }
     const payload = {
-        name: dispositivo.value,
-        estadoR: eP,
+        nombreC: dispositivo.value,
+        estadoP: eP,
     };
-    client.publish("iot/" + dispositivo.value + '/estadoP', JSON.stringify(payload), {
+    client.publish("sa/" + dispositivo.value + '/estadoP', JSON.stringify(payload), {
         quos: 0,
         retain: false,
     });
     console.log(dispositivo.value, ' - estadoP', eP);
+    actualizarlbl();
     return eP;
 }
 
+function detene() {
+    clearInterval(data);
+    bandIniciar = true;
+    client.unsubscribe("#");
+    x = true;
+    estado.textContent = "Desconectado 🔴";
+    console.log(":::: EMULACION DETENIDA ::::");
+}
+
+function inicia() {
+    if (bandIniciar) {
+        console.log(":::: INICA EMULACION :::");
+        data = setInterval(generarDatos, tasaRequest);
+        bandIniciar = false;
+    }
+    client.subscribe("sa/" + dispositivo.value + "/switch");
+    x = false;
+    estado.textContent = "Conectado 🟢";
+
+}
+
+function actualizarlbl() {
+    lblGas.textContent = eG;
+    lblPuerta.textContent = eP;
+}
+
 //Manejador de eventos  para detener el emulador
-detener.addEventListener("click", () => {
+/*detener.addEventListener("click", () => {
     clearInterval(data);
     bandIniciar = true;
     client.unsubscribe("iot/" + dispositivo.value + "/edo", function(err) {
@@ -153,4 +178,4 @@ detener.addEventListener("click", () => {
     });
     estado.textContent = "Desconectado 🔴";
     console.log(":::: EMULACION DETENIDA ::::");
-});
+});*/
