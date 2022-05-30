@@ -67,9 +67,9 @@ iniciar.addEventListener("click", () => {
 function generarDatos() {
     let d = new Date();
     let t = d.toLocaleTimeString();
-    let tem1 = parseFloat((Math.random() * (36 - 22) + 22).toFixed(2));
-    let tem2 = parseFloat((Math.random() * (36 - 22) + 22).toFixed(2));
-    let tem3 = parseFloat((Math.random() * (36 - 22) + 22).toFixed(2));
+    let tem1 = parseFloat((Math.random() * (10 - (-10)) + (-10)).toFixed(2));
+    let tem2 = parseFloat((Math.random() * (10 - (-10)) + (-10)).toFixed(2));
+    let tem3 = parseFloat((Math.random() * (10 - (-10)) + (-10)).toFixed(2));
     let dv = parseFloat((Math.random() * (90 - 65) + 65).toFixed(2));
     //uso axios para enviar datos al api de ubidots
     const payload = {
