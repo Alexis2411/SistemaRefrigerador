@@ -35,6 +35,7 @@ client.on("connect", () => {
     console.log("CLIENTE CONECTADO A BROKER 👌");
 });
 
+//Recepcion de Mensajes
 client.on("message", function(topic, message) {
     console.log(message.toString());
     const x = JSON.parse(message.toString());
@@ -95,13 +96,13 @@ function generarDatos() {
 refri.addEventListener("click", () => {
     switchGas(eG);
 });
-
+//Evento para encender/apagar puertas
 puerta.addEventListener("click", () => {
     switchPuerta(eP);
 });
 
 
-// Funcion que simula el cambio de estado de las luces
+// Funciones que simula el cambio de estado
 function switchGas(tipo) {
     if (tipo === true) {
         eG = false;
@@ -140,46 +141,38 @@ function switchPuerta(tipo) {
     return eP;
 }
 
+//funcion detener el emulador
 function detene() {
     clearInterval(data);
     bandIniciar = true;
+    //Desuscripcion de todos los topicos
     client.unsubscribe("#");
     x = true;
     estado.textContent = "Desconectado 🔴";
     console.log(":::: EMULACION DETENIDA ::::");
 }
 
+//funcion que inicia el emulador
 function inicia() {
+    //Nombre aleatorio si esta vacio
     if (dispositivo.value == "") {
         dispositivo.value = "Nombre" + Math.floor(Math.random() * 1000);
     }
     if (bandIniciar) {
         console.log(":::: INICA EMULACION :::");
+        //Genera datos cada 2500 milisegundos
         data = setInterval(generarDatos, tasaRequest);
         bandIniciar = false;
     }
+    //Suscripcion de topico para recibir los actuadores
     client.subscribe("sa/" + dispositivo.value + "/switch");
     x = false;
     estado.textContent = "Conectado 🟢";
 
 }
 
+//Actualiza las etiquetas de los estados
 function actualizarlbl() {
     lblGas.textContent = eG;
     lblPuerta.textContent = eP;
 }
-
-//Manejador de eventos  para detener el emulador
-/*detener.addEventListener("click", () => {
-    clearInterval(data);
-    bandIniciar = true;
-    client.unsubscribe("iot/" + dispositivo.value + "/edo", function(err) {
-        if (!err) {
-            console.log("SUBSCRIBE - SUCCESS");
-        } else {
-            console.log("SUBSCRIBE - ERROR");
-        }
-    });
-    estado.textContent = "Desconectado 🔴";
-    console.log(":::: EMULACION DETENIDA ::::");
-});*/
