@@ -15,7 +15,8 @@ const options = {
 };
 
 //Constante para url API ubidots CAMBIE LOS DATOS POR SU TOKEN PERSONAL
-const brokerURL = "ws://20.119.68.166:8083/mqtt";
+//const brokerURL = "ws://20.119.68.166:8083/mqtt";
+const brokerURL = "ws://52.188.161.154:8083/mqtt";
 const tasaRequest = 2500;
 
 //Variables para manipulacion del emulador
@@ -34,7 +35,7 @@ client.on("connect", () => {
 client.on("message", function(topic, message) {
     const x = JSON.parse(message.toString());
     console.log(message.toString());
-    agregarFila(x.nombreC, x.temCent, x.temSuIzq, x.temSuDer, x.velocidad, x.estadoR, x.estadoP);
+    agregarFila(x.nombreC, x.temCent, x.temSulzq, x.temSuDer, x.velocidad, x.estadoR, x.estadoP);
 });
 
 client.on("reconnect", (error) => {
@@ -182,6 +183,6 @@ detener.addEventListener("click", () => {
     console.log("Desconectado");
 });
 
-function agregarFila(nombreC, temCent, temSuIzq, temSuDer, velocidad, estadoR, estadoP) {
-    document.getElementById("tablaprueba").insertRow(1).innerHTML = '<td>' + nombreC + '</td><td>' + temCent + '</td><td>' + temSuIzq + '</td><td>' + temSuDer + '</td><td>' + velocidad + '</td><td>' + estadoR + '</td><td>' + estadoP + '</td>';
+function agregarFila(nombreC, temCent, temSulzq, temSuDer, velocidad, estadoR, estadoP) {
+    document.getElementById("tablaprueba").insertRow(1).innerHTML = '<td>' + nombreC + '</td><td>' + temCent + '</td><td>' + temSulzq + '</td><td>' + temSuDer + '</td><td>' + velocidad + '</td><td>' + estadoR + '</td><td>' + estadoP + '</td>';
 }

@@ -17,7 +17,8 @@ const options = {
 };
 
 //Constante para url API ubidots CAMBIE LOS DATOS POR SU TOKEN PERSONAL
-const brokerURL = "ws://20.119.68.166:8083/mqtt";
+//const brokerURL = "ws://20.119.68.166:8083/mqtt";
+const brokerURL = "ws://52.188.161.154:8083/mqtt";
 const tasaRequest = 2500;
 
 //Variables para manipulacion del emulador
@@ -75,7 +76,7 @@ function generarDatos() {
     const payload = {
         nombreC: dispositivo.value,
         temCent: tem1,
-        temSuIzq: tem2,
+        temSulzq: tem2,
         temSuDer: tem3,
         estadoP: eP,
         estadoR: eG,
