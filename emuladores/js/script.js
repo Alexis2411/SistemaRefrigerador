@@ -19,7 +19,7 @@ const options = {
 //Constante para url API ubidots CAMBIE LOS DATOS POR SU TOKEN PERSONAL
 //const brokerURL = "ws://20.119.68.166:8083/mqtt";
 const brokerURL = "ws://52.188.161.154:8083/mqtt";
-const tasaRequest = 2500;
+const tasaRequest = 5000;
 
 //Variables para manipulacion del emulador
 var data;
@@ -160,7 +160,7 @@ function inicia() {
     }
     if (bandIniciar) {
         console.log(":::: INICA EMULACION :::");
-        //Genera datos cada 2500 milisegundos
+        //Genera datos cada 5000 milisegundos
         data = setInterval(generarDatos, tasaRequest);
         bandIniciar = false;
     }
